@@ -1,6 +1,6 @@
-defmodule EctoI18n do
+defmodule Ecto.I18n do
   @moduledoc """
-  Documentation for `EctoI18n`.
+  Documentation for `Ecto.I18n`.
   """
 
   @doc """
@@ -8,7 +8,7 @@ defmodule EctoI18n do
 
   ## Examples
 
-      iex> EctoI18n.hello()
+      iex> Ecto.I18n.hello()
       :world
 
   """
