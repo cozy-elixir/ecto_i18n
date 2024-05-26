@@ -1,4 +1,4 @@
-# Ecto.I18n
+# EctoI18n
 
 **TODO: Add description**
 
@@ -18,3 +18,10 @@ end
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/ecto_i18n>.
+
+## Thanks
+
+This package is built on the wisdom of:
+
+- [trans](https://github.com/crbelaus/trans)
+- [cldr_trans](https://github.com/elixir-cldr/cldr_trans)

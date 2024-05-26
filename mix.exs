@@ -1,8 +1,8 @@
-defmodule Ecto.I18n.MixProject do
+defmodule EctoI18n.MixProject do
   use Mix.Project
 
   @version "0.1.0"
-  @description "I18n support for Ecto."
+  @description "Provides i18n support for Ecto."
   @source_url "https://github.com/cozy-elixir/ecto_i18n"
 
   def project do
@@ -10,6 +10,7 @@ defmodule Ecto.I18n.MixProject do
       app: :ecto_i18n,
       version: @version,
       elixir: "~> 1.14",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: @description,
@@ -28,10 +29,18 @@ defmodule Ecto.I18n.MixProject do
     ]
   end
 
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      {:ecto, "~> 3.0"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:ecto_sql, "~> 3.0", only: :test},
+      {:postgrex, "~> 0.14", only: :test},
+      {:jason, ">= 0.0.0", only: :test}
     ]
   end
 
@@ -52,7 +61,11 @@ defmodule Ecto.I18n.MixProject do
   end
 
   defp aliases do
-    [publish: ["hex.publish", "tag"], tag: &tag_release/1]
+    [
+      test: ["ecto.create --quiet", "ecto.migrate", "test"],
+      publish: ["hex.publish", "tag"],
+      tag: &tag_release/1
+    ]
   end
 
   defp tag_release(_) do
