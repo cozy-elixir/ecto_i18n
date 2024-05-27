@@ -15,7 +15,7 @@ defmodule EctoI18nTest do
                  "zh-Hans": %Product.Locales.Fields{name: "伊莎贝拉沐浴露"},
                  "zh-Hant": %Product.Locales.Fields{name: "伊莎貝拉沐浴露"}
                }
-             } = EctoI18n.localize!(product, :"zh-Hans")
+             } = EctoI18n.localize!(product, "zh-Hans")
     end
   end
 end

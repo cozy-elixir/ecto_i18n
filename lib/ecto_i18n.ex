@@ -48,7 +48,7 @@ defmodule EctoI18n do
 
       defmodule MyApp.Shop.Product do
         use Ecto.Schema
-        use EctoI18n.Schema, default_locale: :en, locales: [:"zh-Hans", :"zh-Hant"]
+        use EctoI18n.Schema, default_locale: "en", locales: ["zh-Hans", "zh-Hant"]
 
         schema "products" do
           field :sku, :string
@@ -72,6 +72,8 @@ defmodule EctoI18n do
     * ...
 
   """
+
+  @type locale :: atom() | binary()
 
   @doc """
   Checks whether a module or a struct is localizable.
@@ -145,12 +147,15 @@ defmodule EctoI18n do
 
   ## Examples
 
-      iex> EctoI18n.localize!(product, :"zh-Hans")
+      iex> EctoI18n.localize!(product, "zh-Hans")
 
   """
-  @spec localize!(struct(), atom()) :: struct()
+  @spec localize!(struct(), locale()) :: struct()
   def localize!(struct, locale) when is_struct(struct) and is_atom(locale),
     do: do_localize!(struct, locale)
+
+  def localize!(struct, locale) when is_struct(struct) and is_binary(locale),
+    do: do_localize!(struct, String.to_atom(locale))
 
   defp do_localize!(%Ecto.Association.NotLoaded{} = term, _locale), do: term
 

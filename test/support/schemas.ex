@@ -13,7 +13,7 @@ defmodule EctoI18n.ProductWithEctoI18nUsedOnly do
   @moduledoc false
 
   use Ecto.Schema
-  use EctoI18n.Schema, default_locale: :en, locales: [:"zh-Hans", :"zh-Hant"]
+  use EctoI18n.Schema, default_locale: "en", locales: ["zh-Hans", "zh-Hant"]
 
   schema "products" do
     field :sku, :string
@@ -25,7 +25,7 @@ defmodule EctoI18n.Product do
   @moduledoc false
 
   use Ecto.Schema
-  use EctoI18n.Schema, default_locale: :en, locales: [:"zh-Hans", :"zh-Hant"]
+  use EctoI18n.Schema, default_locale: "en", locales: ["zh-Hans", "zh-Hant"]
 
   schema "products" do
     field :sku, :string

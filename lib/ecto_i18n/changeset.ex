@@ -22,7 +22,7 @@ defmodule EctoI18n.Changeset do
       defmodule MyApp.Shop.Product do
         use Ecto.Schema
         import Ecto.Changeset
-        use EctoI18n.Schema, default_locale: :en, locales: [:"zh-Hans", :"zh-Hant"]
+        use EctoI18n.Schema, default_locale: "en", locales: ["zh-Hans", "zh-Hant"]
         import EctoI18n.Changeset
 
         schema "products" do

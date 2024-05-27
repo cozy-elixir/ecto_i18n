@@ -41,7 +41,7 @@ defmodule EctoI18n.SchemaTest do
                  fn ->
                    defmodule BadProduct do
                      use Ecto.Schema
-                     use EctoI18n.Schema, default_locale: :en, locales: [:"zh-Hans", :"zh-Hant"]
+                     use EctoI18n.Schema, default_locale: "en", locales: ["zh-Hans", "zh-Hant"]
 
                      schema "products" do
                        field :sku, :string

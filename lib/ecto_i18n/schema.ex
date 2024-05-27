@@ -27,7 +27,7 @@ defmodule EctoI18n.Schema do
 
       defmodule MyApp.Shop.Product do
         use Ecto.Schema
-        use EctoI18n.Schema, default_locale: :en, locales: [:"zh-Hans", :"zh-Hant"]
+        use EctoI18n.Schema, default_locale: "en", locales: ["zh-Hans", "zh-Hant"]
 
         schema "products" do
           field :sku, :string
@@ -147,7 +147,7 @@ defmodule EctoI18n.Schema do
 
     case Keyword.fetch(opts, opt_name) do
       {:ok, default_locale} ->
-        default_locale
+        to_atom(default_locale)
 
       :error ->
         raise ArgumentError,
@@ -160,11 +160,14 @@ defmodule EctoI18n.Schema do
 
     case Keyword.fetch(opts, opt_name) do
       {:ok, locales} ->
-        locales
+        Enum.map(locales, &to_atom/1)
 
       :error ->
         raise ArgumentError,
           message: "#{inspect(__MODULE__)} requires #{inspect(opt_name)} option"
     end
   end
+
+  defp to_atom(string) when is_binary(string), do: String.to_atom(string)
+  defp to_atom(atom) when is_atom(atom), do: atom
 end
