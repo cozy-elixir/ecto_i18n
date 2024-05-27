@@ -37,8 +37,8 @@ defmodule EctoI18n.MixProject do
   defp deps do
     [
       {:ecto, "~> 3.0"},
-      {:ecto_sql, "~> 3.0", only: :test},
-      {:postgrex, "~> 0.14", only: :test},
+      {:ecto_sql, "~> 3.0", only: [:test]},
+      {:postgrex, "~> 0.14", only: [:test]},
       {:jason, ">= 0.0.0", only: [:dev, :test]},
       {:ex_check, "~> 0.15.0", only: [:dev], runtime: false},
       {:credo, ">= 0.0.0", only: [:dev], runtime: false},
