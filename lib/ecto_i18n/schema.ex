@@ -52,7 +52,7 @@ defmodule EctoI18n.Schema do
         embeds_one :"zh-Hant", Fields
       end
 
-  The `Locales` and `Fields` modules will be created automatically.
+  The `Locales` and `Fields` modules will be generated automatically.
 
   """
   defmacro locales(name, do: block) when is_atom(name) do
