@@ -1,7 +1,7 @@
 defmodule EctoI18n.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.2.0"
   @description "Provides i18n support for Ecto."
   @source_url "https://github.com/cozy-elixir/ecto_i18n"
 
