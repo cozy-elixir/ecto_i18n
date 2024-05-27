@@ -5,17 +5,17 @@ defmodule EctoI18n do
   ## Preface
 
   There're [lots of strategies to localize contents in database](https://dejimata.com/2017/3/3/translating-with-mobility).
-  `#{inspect(__MODULE__)}` implements only one specific strategy mentioned above
-  - creating an extra column for storing all the localized contents for that table.
+  `#{inspect(__MODULE__)}` implements only one specific strategy mentioned
+  above - creating an extra column for storing all the localized contents for that table.
 
-  In this way, we can:
+  In this way, it can:
 
     * avoid using extra tables for storing localized contents.
-    * avoid using complex _JOIN_s when retrieving localized contents.
+    * avoid using complex JOINs when retrieving localized contents.
 
   ## Quick start
 
-  Let's say that we have a schema which need to be localized:
+  Let's say that we have a schema which needs to be localized:
 
       defmodule MyApp.Shop.Product do
         use Ecto.Schema
@@ -59,11 +59,12 @@ defmodule EctoI18n do
   > `EctoI18n.Schema.locales/2` to learn more.
 
   Next, you can use the extensions provided by `#{inspect(__MODULE__)}` to
-  work with the updated schema:
+  work with the localized schema, such as:
 
-    * `EctoI18n`
-    * `EctoI18n.Changeset`
-    * `EctoI18n.Query`
+    * `EctoI18n.localize!/2`
+    * `EctoI18n.Changeset.cast_locales/3`
+    * `EctoI18n.Query` (Still in planning)
+    * ...
 
   """
 
