@@ -117,7 +117,9 @@ defmodule EctoI18n.Schema do
 
       def __ecto_i18n_schema__(:locales_called?), do: true
       def __ecto_i18n_schema__(:locales_name), do: unquote(locales_name)
-      def __ecto_i18n_schema__(:locales_fields), do: unquote(locales_fields_module).__schema__(:fields)
+
+      def __ecto_i18n_schema__(:locales_fields),
+        do: unquote(locales_fields_module).__schema__(:fields)
     end
   end
 
