@@ -1,4 +1,4 @@
-defmodule EctoI18n.RepoCase do
+defmodule EctoI18n.DataCase do
   @moduledoc false
 
   use ExUnit.CaseTemplate
@@ -9,7 +9,7 @@ defmodule EctoI18n.RepoCase do
 
       import Ecto
       import Ecto.Query
-      import EctoI18n.RepoCase
+      import EctoI18n.DataCase
     end
   end
 
