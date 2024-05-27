@@ -9,6 +9,11 @@ defmodule EctoI18n.Changeset do
   Casts field which is added by `locales/2` macro.
 
   > The `:with` option is always required.
+  >
+  > `EcotI18n.Schema` doesn't generate any default `changeset/2` function
+  > for the generated schemas. This is intentional. Because no matter what
+  > I do, some needs will be hard to meet, so it's better to leave the
+  > specific implementation to the developer.
 
   > It is built on the top of `Ecto.Changeset.cast_embed/3`.
 
