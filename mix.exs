@@ -66,7 +66,7 @@ defmodule EctoI18n.MixProject do
 
   defp aliases do
     [
-      test: ["ecto.create --quiet", "ecto.migrate", "test"],
+      test: ["ecto.drop --quiet", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
       publish: ["hex.publish", "tag"],
       tag: &tag_release/1
     ]
