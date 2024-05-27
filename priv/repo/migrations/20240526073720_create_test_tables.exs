@@ -6,7 +6,6 @@ defmodule EctoI18n.Repo.Migrations.CreateTestTables do
       add(:sku, :string)
       add(:name, :string)
       add(:locales, :map)
-      timestamps()
     end
   end
 end

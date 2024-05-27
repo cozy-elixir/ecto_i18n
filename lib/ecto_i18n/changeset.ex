@@ -27,8 +27,6 @@ defmodule EctoI18n.Changeset do
           locales :locales do
             field :name, :string
           end
-
-          timestamps()
         end
 
         def changeset(product, attrs) do

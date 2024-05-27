@@ -14,8 +14,6 @@ defmodule EctoI18nTest do
       locales :locales do
         field :name, :string
       end
-
-      timestamps()
     end
   end
 

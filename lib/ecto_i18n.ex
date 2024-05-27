@@ -23,8 +23,6 @@ defmodule EctoI18n do
         schema "products" do
           field :sku, :string
           field :name, :string
-
-          timestamps()
         end
       end
 
@@ -54,8 +52,6 @@ defmodule EctoI18n do
           locales :locales do
             field :name, :string
           end
-
-          timestamps()
         end
       end
 
@@ -96,17 +92,21 @@ defmodule EctoI18n do
   @doc """
   Ensures that a module or a struct is localizable. Or, an error is raised.
   """
-  @spec localizable!(module() | struct()) :: boolean()
+  @spec localizable!(module() | struct()) :: module() | struct()
   def localizable!(module_or_struct)
 
   def localizable!(module) when is_atom(module) do
-    schema_used!(module) &&
-      schema_locales_called!(module)
+    schema_used!(module)
+    schema_locales_called!(module)
+
+    module
   end
 
   def localizable!(struct) when is_struct(struct) do
     module = struct.__struct__
     localizable!(module)
+
+    struct
   end
 
   @doc """
