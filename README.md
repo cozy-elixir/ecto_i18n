@@ -1,23 +1,26 @@
 # EctoI18n
 
-**TODO: Add description**
+> Provides i18n support for Ecto.
+
+## Notes
+
+This package is still in its early stages, so it may still undergo significant changes, potentially leading to breaking changes.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `ecto_i18n` to your list of dependencies in `mix.exs`:
+Add `:ecto_i18n` to the list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:ecto_i18n, "~> 0.1.0"}
+    {:ecto_i18n, <requirement>}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/ecto_i18n>.
+## Usage
+
+For more information, see the [documentation](https://hexdocs.pm/ecto_i18n).
 
 ## Thanks
 
@@ -25,3 +28,7 @@ This package is built on the wisdom of:
 
 - [trans](https://github.com/crbelaus/trans)
 - [cldr_trans](https://github.com/elixir-cldr/cldr_trans)
+
+## License
+
+[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
