@@ -1,4 +1,6 @@
 defmodule EctoI18n.ProductWithoutI18nSupport do
+  @moduledoc false
+
   use Ecto.Schema
 
   schema "products" do
@@ -8,6 +10,8 @@ defmodule EctoI18n.ProductWithoutI18nSupport do
 end
 
 defmodule EctoI18n.ProductWithEctoI18nUsedOnly do
+  @moduledoc false
+
   use Ecto.Schema
   use EctoI18n.Schema, default_locale: :en, locales: [:"zh-Hans", :"zh-Hant"]
 
@@ -18,6 +22,8 @@ defmodule EctoI18n.ProductWithEctoI18nUsedOnly do
 end
 
 defmodule EctoI18n.Product do
+  @moduledoc false
+
   use Ecto.Schema
   use EctoI18n.Schema, default_locale: :en, locales: [:"zh-Hans", :"zh-Hant"]
 
