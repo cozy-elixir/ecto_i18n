@@ -4,13 +4,13 @@ defmodule EctoI18n do
 
   ## Preface
 
-  There're [lots of strategies to localize contents in database](https://dejimata.com/2017/3/3/translating-with-mobility).
-
+  There're [lots of strategies to localize contents in database](https://dejimata.com/2017/3/3/translating-with-mobility)
+  ([archived](https://web.archive.org/web/20240528023514/https://dejimata.com/2017/3/3/translating-with-mobility)).
   For now, `#{inspect(__MODULE__)}` implements only strategy 6 mentioned
   above - creating an extra column for storing all the localized contents
   for that table.
 
-  In this way, it can:
+  With this strategy, it can:
 
     * avoid using extra tables for storing localized contents.
     * avoid using complex JOINs when retrieving localized contents.
