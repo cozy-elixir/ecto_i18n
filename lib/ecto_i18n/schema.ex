@@ -5,18 +5,18 @@ defmodule EctoI18n.Schema do
 
   defmacro __using__(opts) do
     quote do
-      @ecto_i18n_schema_default_locale unquote(build_schema_default_locale(opts))
       @ecto_i18n_schema_locales unquote(build_schema_locales(opts))
+      @ecto_i18n_schema_default_locale unquote(build_schema_default_locale(opts))
+      @ecto_i18n_schema_required_locales @ecto_i18n_schema_locales --
+                                           [@ecto_i18n_schema_default_locale]
 
       import unquote(__MODULE__), only: [locales: 2]
 
       def __ecto_i18n_schema__(:used?), do: true
 
-      def __ecto_i18n_schema__(:default_locale),
-        do: @ecto_i18n_schema_default_locale
-
-      def __ecto_i18n_schema__(:locales),
-        do: @ecto_i18n_schema_locales -- [@ecto_i18n_schema_default_locale]
+      def __ecto_i18n_schema__(:locales), do: @ecto_i18n_schema_locales
+      def __ecto_i18n_schema__(:default_locale), do: @ecto_i18n_schema_default_locale
+      def __ecto_i18n_schema__(:required_locales), do: @ecto_i18n_schema_required_locales
     end
   end
 
@@ -85,7 +85,7 @@ defmodule EctoI18n.Schema do
   end
 
   defmacro __locales_prepare__(env) do
-    locales = Module.get_attribute(env.module, :ecto_i18n_schema_locales)
+    required_locales = Module.get_attribute(env.module, :ecto_i18n_schema_required_locales)
 
     locales_name = Module.get_attribute(env.module, :ecto_i18n_schema_locales_name)
     locales_module = Module.get_attribute(env.module, :ecto_i18n_schema_locales_module)
@@ -100,7 +100,7 @@ defmodule EctoI18n.Schema do
 
         @primary_key false
         embedded_schema do
-          for locale <- List.wrap(unquote(locales)) do
+          for locale <- List.wrap(unquote(required_locales)) do
             embeds_one(locale, unquote(locales_fields_module), on_replace: :update)
           end
         end
@@ -142,12 +142,12 @@ defmodule EctoI18n.Schema do
     end
   end
 
-  defp build_schema_default_locale(opts) do
-    opt_name = :default_locale
+  defp build_schema_locales(opts) do
+    opt_name = :locales
 
     case Keyword.fetch(opts, opt_name) do
-      {:ok, default_locale} ->
-        to_atom(default_locale)
+      {:ok, locales} ->
+        Enum.map(locales, &to_atom/1)
 
       :error ->
         raise ArgumentError,
@@ -155,12 +155,12 @@ defmodule EctoI18n.Schema do
     end
   end
 
-  defp build_schema_locales(opts) do
-    opt_name = :locales
+  defp build_schema_default_locale(opts) do
+    opt_name = :default_locale
 
     case Keyword.fetch(opts, opt_name) do
-      {:ok, locales} ->
-        Enum.map(locales, &to_atom/1)
+      {:ok, default_locale} ->
+        to_atom(default_locale)
 
       :error ->
         raise ArgumentError,

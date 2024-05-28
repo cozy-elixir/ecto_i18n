@@ -52,20 +52,18 @@ defmodule EctoI18n.Changeset do
       def changeset(product, attrs) do
         product
         |> cast(attrs, [:sku, :name])
-        |> cast_embed(:locales, with: &cast_locales/2)
+        |> cast_embed(:locales, required: true, with: &cast_locales/2)
       end
 
       defp cast_locales(locales, attrs) do
         locales
         |> cast(attrs, [])
-        |> cast_embed(:"zh-Hans", with: &cast_locale/2)
-        |> cast_embed(:"zh-Hant", with: &cast_locale/2)
+        |> cast_embed(:"zh-Hans", required: true, with: &cast_locale/2)
+        |> cast_embed(:"zh-Hant", required: true, with: &cast_locale/2)
       end
 
   """
   def cast_locales(changeset, name, opts) do
-    inner_with_fun = Keyword.fetch!(opts, :with)
-
     struct = changeset.data
     module = struct.__struct__
 
@@ -73,18 +71,22 @@ defmodule EctoI18n.Changeset do
     EctoI18n.schema_locales_called!(module)
     EctoI18n.schema_locales_name!(module, name)
 
-    cast_embed(changeset, name, with: build_with_fun(module, inner_with_fun))
+    cast_embed(changeset, name,
+      required: true,
+      with: build_with_fun(module, opts)
+    )
   end
 
-  defp build_with_fun(module, inner_with_fun) do
-    locales = module.__ecto_i18n_schema__(:locales)
+  defp build_with_fun(module, opts) do
+    required_locales = module.__ecto_i18n_schema__(:required_locales)
+    opts = Keyword.put_new(opts, :required, true)
 
     fn struct, attrs ->
       struct
       |> cast(attrs, [])
       |> then(
-        &Enum.reduce(locales, &1, fn locale, changeset ->
-          cast_embed(changeset, locale, with: inner_with_fun)
+        &Enum.reduce(required_locales, &1, fn locale, changeset ->
+          cast_embed(changeset, locale, opts)
         end)
       )
     end
