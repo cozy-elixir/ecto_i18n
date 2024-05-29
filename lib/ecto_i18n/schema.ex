@@ -27,7 +27,7 @@ defmodule EctoI18n.Schema do
 
       defmodule MyApp.Shop.Product do
         use Ecto.Schema
-        use EctoI18n.Schema, default_locale: "en", locales: ["zh-Hans", "zh-Hant"]
+        use EctoI18n.Schema, locales: ["en", "zh-Hans", "zh-Hant"], default_locale: "en"
 
         schema "products" do
           field :sku, :string

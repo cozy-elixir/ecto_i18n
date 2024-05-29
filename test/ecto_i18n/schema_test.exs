@@ -8,6 +8,7 @@ defmodule EctoI18n.SchemaTest do
       assert ProductWithEctoI18nUsedOnly.__ecto_i18n_schema__(:default_locale) == :en
 
       assert ProductWithEctoI18nUsedOnly.__ecto_i18n_schema__(:locales) == [
+               :en,
                :"zh-Hans",
                :"zh-Hant"
              ]
@@ -29,7 +30,7 @@ defmodule EctoI18n.SchemaTest do
       alias EctoI18n.Product
 
       assert Product.__ecto_i18n_schema__(:default_locale) == :en
-      assert Product.__ecto_i18n_schema__(:locales) == [:"zh-Hans", :"zh-Hant"]
+      assert Product.__ecto_i18n_schema__(:locales) == [:en, :"zh-Hans", :"zh-Hant"]
       assert Product.__ecto_i18n_schema__(:locales_name) == :locales
       assert Product.__ecto_i18n_schema__(:locales_fields) == [:name]
     end
@@ -41,7 +42,10 @@ defmodule EctoI18n.SchemaTest do
                  fn ->
                    defmodule BadProduct do
                      use Ecto.Schema
-                     use EctoI18n.Schema, default_locale: "en", locales: ["zh-Hans", "zh-Hant"]
+
+                     use EctoI18n.Schema,
+                       locales: ["en", "zh-Hans", "zh-Hant"],
+                       default_locale: "en"
 
                      schema "products" do
                        field :sku, :string
