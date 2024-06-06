@@ -55,10 +55,12 @@ At this stage, we focus on the actual l10n work.
 
 ## Thanks
 
-This package is built on the wisdom of:
+This package is built or will built on the wisdom of:
 
-- [trans](https://github.com/crbelaus/trans)
-- [cldr_trans](https://github.com/elixir-cldr/cldr_trans)
+- [trans](https://github.com/crbelaus/trans) / [cldr_trans](https://github.com/elixir-cldr/cldr_trans)
+- [i18n_helpers](https://github.com/mathieuprog/i18n_helpers)
+  - [Announcements at ElixirForum](https://elixirforum.com/t/i18n-helpers-ease-the-use-of-embedded-translations-in-ecto-schemas/25617)
+- [ecto_translate](https://github.com/smeevil/ecto_translate)
 
 ## License
 
