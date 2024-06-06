@@ -62,9 +62,10 @@ defmodule EctoI18n do
   Next, you can use the extensions provided by `#{inspect(__MODULE__)}` to
   work with the localized schema, such as:
 
-    * `EctoI18n.i18n_support?/_`
+    * `EctoI18n.i18n_support?/1` / `EctoI18n.i18n_support?/2`
+    * `EctoI18n.locales/1`
     * `EctoI18n.localize!/2`
-    * `EctoI18n.Changeset.cast_i18n/_`
+    * `EctoI18n.Changeset.cast_i18n/2` / `EctoI18n.Changeset.cast_i18n/3`
     * `EctoI18n.Query` (Still in planning)
     * ...
 
