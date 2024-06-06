@@ -1,3 +1,15 @@
+defmodule EctoI18n.ProductWithoutI18nSupport do
+  @moduledoc false
+
+  use Ecto.Schema
+
+  schema "products" do
+    field :sku, :string
+    field :name, :string
+    field :price, :integer
+  end
+end
+
 defmodule EctoI18n.Product do
   @moduledoc false
 

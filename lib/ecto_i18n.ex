@@ -106,6 +106,26 @@ defmodule EctoI18n do
   end
 
   @doc """
+  Returns supported locales of a struct or the underlying module.
+  """
+  @spec locales(module() | struct()) :: [locale()]
+  def locales(module_or_struct)
+
+  def locales(module) when is_atom(module) do
+    unless i18n_support?(module) do
+      raise RuntimeError,
+            "`#{inspect(module)}` module doesn't have i18n support"
+    end
+
+    module.__ecto_i18n__(:locales)
+  end
+
+  def locales(struct) when is_struct(struct) do
+    module = struct.__struct__
+    locales(module)
+  end
+
+  @doc """
   Localizes a struct with given locale recursively.
 
   All localizable values in the struct will be localized into the give locale.
