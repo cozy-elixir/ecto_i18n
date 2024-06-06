@@ -57,7 +57,7 @@ defmodule EctoI18n do
       end
 
   > If you're curious about the underlying implementation here, you can read
-  > `EctoI18n.Schema/2` to learn more.
+  > `EctoI18n.Schema` to learn more.
 
   Next, you can use the extensions provided by `#{inspect(__MODULE__)}` to
   work with the localized schema, such as:
