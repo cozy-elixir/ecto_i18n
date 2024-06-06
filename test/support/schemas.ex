@@ -6,6 +6,7 @@ defmodule EctoI18n.ProductWithoutI18nSupport do
   schema "products" do
     field :sku, :string
     field :name, :string
+    # I know, I should use a real currency type.
     field :price, :integer
   end
 end
