@@ -20,7 +20,7 @@ defmodule EctoI18nTest do
       assert_raise RuntimeError,
                    "`EctoI18n.ProductWithoutI18nSupport` module doesn't have i18n support",
                    fn ->
-                     EctoI18n.locales(EctoI18n.ProductWithoutI18nSupport)
+                     EctoI18n.locales(ProductWithoutI18nSupport)
                    end
     end
   end

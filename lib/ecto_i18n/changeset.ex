@@ -34,7 +34,7 @@ defmodule EctoI18n.Changeset do
 
       def changeset(product, attrs) do
         product
-        |> cast(attrs, [:sku, :name])
+        |> cast(attrs, [:sku])
         |> cast_embed(:name_i18n, required: true)
       end
 

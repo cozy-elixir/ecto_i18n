@@ -7,8 +7,7 @@ defmodule EctoI18n do
   There're [lots of strategies to localize contents in database](https://dejimata.com/2017/3/3/translating-with-mobility)
   ([archived](https://web.archive.org/web/20240528023514/https://dejimata.com/2017/3/3/translating-with-mobility)).
   For now, `#{inspect(__MODULE__)}` implements only strategy 6 mentioned
-  above - creating an extra column for storing all the localized data
-  for that table.
+  above - using a column of `:map` type for storing all the related localized data.
 
   With this strategy, it can:
 
@@ -39,7 +38,7 @@ defmodule EctoI18n do
 
         def change do
           alter table(:products) do
-            add :name_i18n, :map
+            add :name_i18n, :map, null: false
           end
         end
       end
