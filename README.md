@@ -39,7 +39,7 @@ The goal of g11n is to make products adapted in different languages and cultural
 
 It refers to the process of designing and developing a product to be adaptable to different languages and cultural environments.
 
-It is the preparation for locaization. When i18n is done, there's no need for further programmatic changes to the product to switch between languages.
+It is the preparation for l10n. When i18n is done, there's no need for further programmatic changes to the product to switch between languages.
 
 At this stage, we are not conducting actual l10n work but rather providing the infrastructure for l10n.
 
