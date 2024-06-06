@@ -5,140 +5,100 @@ defmodule EctoI18n.Schema do
 
   defmacro __using__(opts) do
     quote do
-      @ecto_i18n_schema_locales unquote(build_schema_locales(opts))
-      @ecto_i18n_schema_default_locale unquote(build_schema_default_locale(opts))
-      @ecto_i18n_schema_required_locales @ecto_i18n_schema_locales --
-                                           [@ecto_i18n_schema_default_locale]
+      @ecto_i18n_locales unquote(build_schema_locales(opts))
+      Module.register_attribute(__MODULE__, :ecto_i18n_fields, accumulate: true)
 
-      import unquote(__MODULE__), only: [locales: 2]
+      @before_compile {unquote(__MODULE__), :__before_compile__}
 
-      def __ecto_i18n_schema__(:used?), do: true
-
-      def __ecto_i18n_schema__(:locales), do: @ecto_i18n_schema_locales
-      def __ecto_i18n_schema__(:default_locale), do: @ecto_i18n_schema_default_locale
-      def __ecto_i18n_schema__(:required_locales), do: @ecto_i18n_schema_required_locales
+      import unquote(__MODULE__), only: [field_i18n: 1, field_i18n: 2, field_i18n: 3]
     end
   end
 
+  defmacro __before_compile__(env) do
+    locales = Module.get_attribute(env.module, :ecto_i18n_locales)
+    fields = Module.get_attribute(env.module, :ecto_i18n_fields) |> Enum.reverse()
+
+    modules =
+      Enum.map(fields, fn {_name, _name_i18n, type, opts, mod} ->
+        quote do
+          defmodule unquote(mod) do
+            @moduledoc false
+
+            use Ecto.Schema
+            import Ecto.Changeset
+
+            @primary_key false
+            embedded_schema do
+              for locale <- List.wrap(unquote(locales)) do
+                field locale, unquote(type), unquote(opts)
+              end
+            end
+
+            @doc false
+            def changeset(struct, params) do
+              struct
+              |> cast(params, unquote(locales))
+              |> validate_required(unquote(locales))
+            end
+          end
+        end
+      end)
+
+    reflections =
+      quote do
+        def __ecto_i18n__(:locales), do: unquote(locales)
+        def __ecto_i18n__(:fields), do: unquote(Enum.map(fields, &elem(&1, 0)))
+        def __ecto_i18n__(:i18n_fields), do: unquote(Enum.map(fields, &elem(&1, 1)))
+        def __ecto_i18n__(:mappings), do: unquote(Enum.map(fields, &{elem(&1, 0), elem(&1, 1)}))
+      end
+
+    [modules, reflections]
+  end
+
   @doc """
-  Creates a field for storing localized contents.
+  Creates a virtual field and an embed for storing localized data.
 
   ## Example
 
       defmodule MyApp.Shop.Product do
         use Ecto.Schema
-        use EctoI18n.Schema, locales: ["en", "zh-Hans", "zh-Hant"], default_locale: "en"
+        use EctoI18n.Schema, locales: ["en", "zh-Hans"]
 
         schema "products" do
           field :sku, :string
-          field :name, :string
-
-          locales :locales do
-            field :name, :string
-          end
+          field_i18n :name, :string
         end
       end
 
   In above code, calling:
 
-      locales :locales do
-        field :name, :string
-      end
+      field_i18n :name, :string
 
   equals to:
 
-      embeds_one :locales, Locales do
-        embeds_one :"zh-Hans", Fields
-        embeds_one :"zh-Hant", Fields
+      field :name, :string, virtual: true
+      embeds_one :name_i18n, NameI18n do
+        field :"en", :string
+        field :"zh-Hans", :string
       end
 
-  The `Locales` and `Fields` modules will be generated automatically.
+  The `NameI18n` module will be generated automatically.
 
   """
-  defmacro locales(name, do: block) when is_atom(name) do
+  defmacro field_i18n(name, type \\ :string, opts \\ []) when is_atom(name) do
     caller = __CALLER__
-
-    locales_module =
-      name
-      |> to_string()
-      |> Macro.camelize()
-      |> then(&Module.concat([__CALLER__.module, &1]))
-
-    locales_block = Macro.escape(block)
+    name_i18n = to_atom("#{name}_i18n")
+    module_i18n = Module.concat([caller.module, "#{Macro.camelize(to_string(name))}I18n"])
 
     quote do
-      if line = Module.get_attribute(__MODULE__, :ecto_i18n_schema_locales_called) do
-        raise "locales/2 can only be called once for #{inspect(__MODULE__)}"
-      end
+      Module.put_attribute(
+        __MODULE__,
+        :ecto_i18n_fields,
+        {unquote(name), unquote(name_i18n), unquote(type), unquote(opts), unquote(module_i18n)}
+      )
 
-      @ecto_i18n_schema_locales_called unquote(caller.line)
-
-      @ecto_i18n_schema_locales_name unquote(name)
-      @ecto_i18n_schema_locales_module unquote(locales_module)
-      @ecto_i18n_schema_locales_block unquote(locales_block)
-
-      @before_compile {unquote(__MODULE__), :__locales_prepare__}
-      @after_compile {unquote(__MODULE__), :__locales_validate_fields__}
-
-      embeds_one(unquote(name), unquote(locales_module), on_replace: :update)
-    end
-  end
-
-  defmacro __locales_prepare__(env) do
-    required_locales = Module.get_attribute(env.module, :ecto_i18n_schema_required_locales)
-
-    locales_name = Module.get_attribute(env.module, :ecto_i18n_schema_locales_name)
-    locales_module = Module.get_attribute(env.module, :ecto_i18n_schema_locales_module)
-    locales_block = Module.get_attribute(env.module, :ecto_i18n_schema_locales_block)
-    locales_fields_module = Module.concat(locales_module, Fields)
-
-    quote do
-      defmodule unquote(locales_module) do
-        @moduledoc false
-
-        use Ecto.Schema
-
-        @primary_key false
-        embedded_schema do
-          for locale <- List.wrap(unquote(required_locales)) do
-            embeds_one(locale, unquote(locales_fields_module), on_replace: :update)
-          end
-        end
-      end
-
-      defmodule unquote(locales_fields_module) do
-        @moduledoc false
-
-        use Ecto.Schema
-
-        @primary_key false
-        embedded_schema(do: unquote(locales_block))
-      end
-
-      def __ecto_i18n_schema__(:locales_called?), do: true
-      def __ecto_i18n_schema__(:locales_name), do: unquote(locales_name)
-
-      def __ecto_i18n_schema__(:locales_fields),
-        do: unquote(locales_fields_module).__schema__(:fields)
-    end
-  end
-
-  @doc false
-  def __locales_validate_fields__(%{module: module}, _) do
-    struct_fields =
-      module.__schema__(:fields)
-      |> MapSet.new()
-
-    localizable_fields =
-      module.__ecto_i18n_schema__(:locales_fields)
-      |> MapSet.new()
-
-    invalid_fields = MapSet.difference(localizable_fields, struct_fields)
-
-    if MapSet.size(invalid_fields) > 0 do
-      raise ArgumentError,
-        message:
-          "#{inspect(module)} declares localized fields which are not defined in the schema: #{inspect(MapSet.to_list(invalid_fields))}"
+      field unquote(name), unquote(type), unquote(Keyword.put(opts, :virtual, true))
+      embeds_one unquote(name_i18n), unquote(module_i18n), on_replace: :update
     end
   end
 
@@ -148,19 +108,6 @@ defmodule EctoI18n.Schema do
     case Keyword.fetch(opts, opt_name) do
       {:ok, locales} ->
         Enum.map(locales, &to_atom/1)
-
-      :error ->
-        raise ArgumentError,
-          message: "#{inspect(__MODULE__)} requires #{inspect(opt_name)} option"
-    end
-  end
-
-  defp build_schema_default_locale(opts) do
-    opt_name = :default_locale
-
-    case Keyword.fetch(opts, opt_name) do
-      {:ok, default_locale} ->
-        to_atom(default_locale)
 
       :error ->
         raise ArgumentError,

@@ -4,8 +4,8 @@ defmodule EctoI18n.Repo.Migrations.CreateTestTables do
   def change do
     create table(:products) do
       add :sku, :string
-      add :name, :string
-      add :locales, :map
+      add :name_i18n, :map
+      add :price_i18n, :map
     end
   end
 end

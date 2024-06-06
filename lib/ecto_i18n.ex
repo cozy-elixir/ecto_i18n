@@ -7,13 +7,13 @@ defmodule EctoI18n do
   There're [lots of strategies to localize contents in database](https://dejimata.com/2017/3/3/translating-with-mobility)
   ([archived](https://web.archive.org/web/20240528023514/https://dejimata.com/2017/3/3/translating-with-mobility)).
   For now, `#{inspect(__MODULE__)}` implements only strategy 6 mentioned
-  above - creating an extra column for storing all the localized contents
+  above - creating an extra column for storing all the localized data
   for that table.
 
   With this strategy, it can:
 
-    * avoid using extra tables for storing localized contents.
-    * avoid using complex JOINs when retrieving localized contents.
+    * avoid using extra tables for storing localized data.
+    * avoid using complex JOINs when retrieving localized data.
 
   > Maybe other strategies will be implemented later, but for now, I only
   > need this one.
@@ -32,14 +32,14 @@ defmodule EctoI18n do
       end
 
   The first step is to add a new column to the table at database level, so
-  we can store localized contents in it:
+  we can store localized data in it:
 
       defmodule MyApp.Repo.Migrations.AddLocalesToProducts do
         use Ecto.Migration
 
         def change do
           alter table(:products) do
-            add :locales, :map
+            add :name_i18n, :map
           end
         end
       end
@@ -48,26 +48,23 @@ defmodule EctoI18n do
 
       defmodule MyApp.Shop.Product do
         use Ecto.Schema
-        use EctoI18n.Schema, locales: ["en", "zh-Hans", "zh-Hant"], default_locale: "en"
+        use EctoI18n.Schema, locales: ["en", "zh-Hans"]
 
         schema "products" do
           field :sku, :string
-          field :name, :string
-
-          locales :locales do
-            field :name, :string
-          end
+          field_i18n :name, :string
         end
       end
 
   > If you're curious about the underlying implementation here, you can read
-  > `EctoI18n.Schema.locales/2` to learn more.
+  > `EctoI18n.Schema/2` to learn more.
 
   Next, you can use the extensions provided by `#{inspect(__MODULE__)}` to
   work with the localized schema, such as:
 
+    * `EctoI18n.i18n_support?/_`
     * `EctoI18n.localize!/2`
-    * `EctoI18n.Changeset.cast_locales/3`
+    * `EctoI18n.Changeset.cast_i18n/_`
     * `EctoI18n.Query` (Still in planning)
     * ...
 
@@ -76,7 +73,7 @@ defmodule EctoI18n do
   @type locale :: atom() | binary()
 
   @doc """
-  Checks whether a module or a struct is localizable.
+  Checks whether a module or a struct has i18n support.
 
   ## Examples
 
@@ -84,60 +81,28 @@ defmodule EctoI18n do
       iex> EctoI18n.localizable?(%Product{})
 
   """
-  @spec localizable?(module() | struct()) :: boolean()
-  def localizable?(module_or_struct)
+  @spec i18n_support?(module() | struct()) :: boolean()
+  def i18n_support?(module_or_struct)
 
-  def localizable?(module) when is_atom(module) do
-    schema_used?(module) &&
-      schema_locales_called?(module)
+  def i18n_support?(module) when is_atom(module) do
+    {:__ecto_i18n__, 1} in module.__info__(:functions)
   end
 
-  def localizable?(struct) when is_struct(struct) do
+  def i18n_support?(struct) when is_struct(struct) do
     module = struct.__struct__
-    localizable?(module)
+    i18n_support?(module)
   end
 
-  @doc """
-  Ensures that a module or a struct is localizable. Or, an error is raised.
-  """
-  @spec localizable!(module() | struct()) :: module() | struct()
-  def localizable!(module_or_struct)
+  @spec i18n_support?(module() | struct(), atom()) :: boolean()
+  def i18n_support?(module_or_struct, field)
 
-  def localizable!(module) when is_atom(module) do
-    schema_used!(module)
-    schema_locales_called!(module)
-
-    module
+  def i18n_support?(module, field) when is_atom(module) do
+    i18n_support?(module) && field in module.__ecto_i18n__(:fields)
   end
 
-  def localizable!(struct) when is_struct(struct) do
+  def i18n_support?(struct, field) when is_struct(struct) do
     module = struct.__struct__
-    localizable!(module)
-
-    struct
-  end
-
-  @doc """
-  Checks whether a field in a module or a struct is localizable.
-
-  ## Examples
-
-      iex> Ecto.localizable?(Product, :name)
-      iex> Ecto.localizable?(%Product{}, :name)
-
-  """
-  @spec localizable?(module() | struct(), atom()) :: boolean()
-  def localizable?(module_or_struct, field)
-
-  def localizable?(module, field) when is_atom(module) and is_atom(field) do
-    schema_used?(module) &&
-      schema_locales_called?(module) &&
-      schema_locales_field?(module, field)
-  end
-
-  def localizable?(struct, field) when is_struct(struct) and is_atom(field) do
-    module = struct.__struct__
-    localizable?(module, field)
+    i18n_support?(module, field)
   end
 
   @doc """
@@ -163,23 +128,13 @@ defmodule EctoI18n do
     module = struct.__struct__
 
     struct =
-      if EctoI18n.localizable?(module) &&
-           locale !== module.__ecto_i18n_schema__(:default_locale) do
-        schema_locale!(module, locale)
+      if EctoI18n.i18n_support?(module) do
+        mappings = module.__ecto_i18n__(:mappings)
 
-        locales_name = module.__ecto_i18n_schema__(:locales_name)
-        fields = module.__ecto_i18n_schema__(:locales_fields)
-
-        base_fields = Map.from_keys(fields, nil)
-
-        localized_fields =
-          struct
-          |> Map.fetch!(locales_name)
-          |> Map.fetch!(locale)
-          |> Map.take(fields)
-          |> then(&Map.merge(base_fields, &1))
-
-        Map.merge(struct, localized_fields)
+        Enum.reduce(mappings, struct, fn {field, i18n_field}, acc ->
+          value = struct |> Map.fetch!(i18n_field) |> Map.fetch!(locale)
+          Kernel.struct(acc, [{field, value}])
+        end)
       else
         struct
       end
@@ -210,84 +165,4 @@ defmodule EctoI18n do
   end
 
   defp do_localize!(term, _locale), do: term
-
-  # Helper functions
-
-  @doc false
-  def schema_used?(module) do
-    try do
-      module.__ecto_i18n_schema__(:used?)
-    rescue
-      [ArgumentError, UndefinedFunctionError] ->
-        false
-    end
-  end
-
-  @doc false
-  def schema_used!(module) do
-    unless schema_used?(module) do
-      raise "#{inspect(module)} must use `EctoI18n.Schema` in order to be localizable"
-    end
-  end
-
-  @doc false
-  def schema_locales_called?(module) do
-    try do
-      module.__ecto_i18n_schema__(:locales_called?)
-    rescue
-      [ArgumentError, UndefinedFunctionError] ->
-        false
-    end
-  end
-
-  @doc false
-  def schema_locales_called!(module) do
-    unless schema_locales_called?(module) do
-      raise "#{inspect(module)} must call `locales/2` in order to be localizable"
-    end
-  end
-
-  @doc false
-  def schema_locales_name?(module, name) do
-    try do
-      name == module.__ecto_i18n_schema__(:locales_name)
-    rescue
-      [ArgumentError, UndefinedFunctionError] ->
-        false
-    end
-  end
-
-  @doc false
-  def schema_locales_name!(module, name) do
-    unless schema_locales_name?(module, name) do
-      raise "#{inspect(module)} must call `locales #{inspect(name)}, do: block` in order to be localizable"
-    end
-  end
-
-  @doc false
-  def schema_locale?(module, locale) do
-    try do
-      locale in module.__ecto_i18n_schema__(:locales)
-    rescue
-      [ArgumentError, UndefinedFunctionError] ->
-        false
-    end
-  end
-
-  @doc false
-  def schema_locale!(module, locale) do
-    unless schema_locale?(module, locale) do
-      raise "#{inspect(module)} doesn't support #{inspect(locale)} locale"
-    end
-  end
-
-  @doc false
-  def schema_locales_field?(module, field) do
-    try do
-      field in module.__ecto_i18n_schema__(:locales_fields)
-    rescue
-      [ArgumentError, UndefinedFunctionError] ->
-        false
-    end
-  end
 end
