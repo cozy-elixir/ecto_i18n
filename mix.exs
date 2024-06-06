@@ -50,7 +50,7 @@ defmodule EctoI18n.MixProject do
 
   defp docs do
     [
-      extras: ["README.md"],
+      extras: ["README.md", "guides/integrations.md"],
       main: "readme",
       source_url: @source_url,
       source_ref: "v#{@version}"
