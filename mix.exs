@@ -40,7 +40,7 @@ defmodule EctoI18n.MixProject do
       {:ecto_sql, "~> 3.0", only: [:dev, :test]},
       {:postgrex, "~> 0.14", only: [:dev, :test]},
       {:jason, ">= 0.0.0", only: [:dev, :test]},
-      {:ex_check, "~> 0.15.0", only: [:dev], runtime: false},
+      {:ex_check, ">= 0.0.0", only: [:dev], runtime: false},
       {:credo, ">= 0.0.0", only: [:dev], runtime: false},
       {:dialyxir, ">= 0.0.0", only: [:dev], runtime: false},
       {:ex_doc, ">= 0.0.0", only: [:dev], runtime: false},
