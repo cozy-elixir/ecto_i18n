@@ -40,6 +40,17 @@ defmodule EctoI18n.Schema do
               |> cast(params, unquote(locales))
               |> validate_required(unquote(locales))
             end
+
+            @behaviour Access
+
+            @impl Access
+            def fetch(term, key), do: Map.fetch(term, key)
+
+            @impl Access
+            def get_and_update(term, key, fun), do: Map.get_and_update(term, key, fun)
+
+            @impl Access
+            def pop(term, key), do: Map.pop(term, key)
           end
         end
       end)
