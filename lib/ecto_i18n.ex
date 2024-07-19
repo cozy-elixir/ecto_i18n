@@ -77,8 +77,8 @@ defmodule EctoI18n do
 
   ## Examples
 
-      iex> EctoI18n.localizable?(Product)
-      iex> EctoI18n.localizable?(%Product{})
+      iex> EctoI18n.i18n_support?(Product)
+      iex> EctoI18n.i18n_support?(%Product{})
 
   """
   @spec i18n_support?(module() | struct()) :: boolean()
