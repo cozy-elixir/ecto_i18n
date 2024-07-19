@@ -14,6 +14,11 @@ defmodule EctoI18n.Schema do
     end
   end
 
+  # Suppress credo warning:
+  #
+  #  Function is too complex (cyclomatic complexity is 10, max is 9)
+  #
+  # credo:disable-for-next-line
   defmacro __before_compile__(env) do
     locales = Module.get_attribute(env.module, :ecto_i18n_locales)
     fields = Module.get_attribute(env.module, :ecto_i18n_fields) |> Enum.reverse()
